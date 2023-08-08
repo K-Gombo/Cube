@@ -57,7 +57,7 @@ public class QuadMovement : MonoBehaviour
             int currentTopFace = GameManager.instance.DetermineTopFace();
             if (referencedFaceGroup == (GameManager.FaceGroup)(currentTopFace - 1))
             {
-                Debug.Log("성공: Quad가 참조한 face와 현재 큐브의 윗면이 일치합니다!");
+                // Debug.Log("성공: Quad가 참조한 face와 현재 큐브의 윗면이 일치합니다!");
             }
             else
             {
