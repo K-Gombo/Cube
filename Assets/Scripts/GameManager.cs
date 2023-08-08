@@ -1,7 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SocialPlatforms.Impl;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
@@ -17,14 +20,24 @@ public class GameManager : MonoBehaviour
     public GameObject life3;
 
     public Text scoreText; // Score Text 오브젝트
+    public Text comboText; // Combo Text 오브젝트
+    public Text speedText; // speed Text 오브젝트
+   
+    private bool isGameOver = false;
 
-    private float minSpawnInterval = 4f;
-    private float maxSpawnInterval = 7f;
+    private float minSpawnInterval = 2f;
+    private float maxSpawnInterval = 5f;
     private float timer = 0f;
     private float spawnInterval = 1f;
+    private float currentSpeed = 1.00f; // 현재 스피드
 
-    private int currentLife = 3;
+    public static float globalMoveSpeed = 4f;
+    
+    private int currentLife = 3; //현재 목숨
     private int currentScore = 0; // 현재 점수
+    private int currentCombo = 0; //현재 콤보
+    
+   
 
     public enum FaceGroup
     {
@@ -40,15 +53,22 @@ public class GameManager : MonoBehaviour
 
     public event QuadCreatedDelegate OnQuadCreated;
 
-    private void Start()
+    private void Awake()
     {
         instance = this;
+    }
+
+    private void Start()
+    {
         InitializeFaceMaterials();
         UpdateScoreUI(); // 초기 스코어를 표시해줍니다.
     }
 
     private void Update()
     {
+        if (isGameOver)
+            return; // 게임이 종료된 경우 아무 것도 실행하지 않습니다.
+
         timer += Time.deltaTime;
 
         if (timer >= spawnInterval)
@@ -129,6 +149,10 @@ public class GameManager : MonoBehaviour
     {
         currentLife--;
 
+        // 콤보 리셋 및 UI 업데이트
+        currentCombo = 0;
+        UpdateComboUI();
+
         switch (currentLife)
         {
             case 2:
@@ -139,7 +163,7 @@ public class GameManager : MonoBehaviour
                 break;
             case 0:
                 Destroy(life3);
-                // 마지막 Life가 사라진 후 게임 종료 처리를 호출합니다.
+                isGameOver = true; // 게임이 종료되었습니다.
                 StartCoroutine(GameOverCoroutine());
                 break;
         }
@@ -148,9 +172,13 @@ public class GameManager : MonoBehaviour
     // 매칭 성공 시에 호출되는 함수
     public void MatchSuccess()
     {
-        currentScore += 50; // 점수를 50씩 증가시킵니다.
-        UpdateScoreUI(); // 스코어 UI를 업데이트합니다.
+        currentScore += 50; 
+        currentCombo += 1;
+        UpdateScoreUI();
+        UpdateComboUI();
+       
     }
+    
 
     private IEnumerator GameOverCoroutine()
     {
@@ -165,8 +193,44 @@ public class GameManager : MonoBehaviour
         // 여기에 게임 종료에 대한 처리를 추가할 수 있습니다.
     }
 
+    // UpdateScoreUI() 메서드 내에서 1000의 배수일 때 UpdateSpeedUI() 메서드를 호출하도록 수정
     private void UpdateScoreUI()
     {
         scoreText.text = currentScore.ToString(); // 스코어 UI를 업데이트합니다.
+
+        if (currentScore > 0 && currentScore % 1000 == 0) // 1000의 배수인 경우
+        {
+            GameManager.globalMoveSpeed += 0.5f; // globalMoveSpeed를 직접 증가시킵니다.
+            UpdateSpeedUI(); // 1000의 배수일 때 스피드 UI를 업데이트합니다.
+        }
     }
+
+    private void UpdateComboUI()
+    {
+        comboText.text = currentCombo.ToString() + " COMBO"; // 콤보 UI 업데이트
+    }
+
+    // 새로운 메서드로 스피드 UI 업데이트
+    private void UpdateSpeedUI()
+    {
+        if (currentScore > 0 && currentScore % 1000 == 0)
+        {
+            currentSpeed += 0.125f;
+        }
+        UpdateSpeedText();
+    }
+
+    private void UpdateSpeedText()
+    {
+        speedText.text = "x" + currentSpeed.ToString("F3");
+    }
+    
+    public bool IsGameOver()
+    {
+        return isGameOver;
+    }
+
+    
+    
+    
 }

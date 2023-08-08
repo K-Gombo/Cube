@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,15 +7,16 @@ public class QuadMovement : MonoBehaviour
 {
     private Transform startPos;
     private Transform endPos;
-    private float moveSpeed = 3f;
+    private float moveSpeed = 4f;
     private float startTime;
     private float journeyLength;
-    private float spawnInterval = 5f;
+    private float spawnInterval = 3f;
 
     private bool isMoving = false;
 
     private GameManager.FaceGroup referencedFaceGroup;
-
+    
+    
     public void Initialize(Transform start, Transform end, float interval, GameManager.FaceGroup faceGroup)
     {
         startPos = start;
@@ -28,6 +30,9 @@ public class QuadMovement : MonoBehaviour
 
         startTime = Time.time;
         journeyLength = Vector3.Distance(startPos.position, endPos.position);
+
+        // moveSpeed를 GameManager의 globalMoveSpeed로 설정
+        moveSpeed = GameManager.globalMoveSpeed;
     }
 
     public void StartMoving()
@@ -37,8 +42,18 @@ public class QuadMovement : MonoBehaviour
 
     void Update()
     {
+        if (GameManager.instance.IsGameOver())
+            return;  // 게임 종료 상태면 아무 동작도 하지 않음
+
+        moveSpeed = GameManager.globalMoveSpeed; // 동기화 추가
         if (isMoving)
             MoveQuad();
+        Debug.Log("Current moveSpeed: " + moveSpeed);
+    }
+    
+    public void IncreaseMoveSpeed(float amount)
+    {
+        moveSpeed += amount;
     }
 
     void MoveQuad()
@@ -57,17 +72,15 @@ public class QuadMovement : MonoBehaviour
             int currentTopFace = GameManager.instance.DetermineTopFace();
             if (referencedFaceGroup == (GameManager.FaceGroup)(currentTopFace - 1))
             {
-                // Debug.Log("성공: Quad가 참조한 face와 현재 큐브의 윗면이 일치합니다!");
+               GameManager.instance.MatchSuccess();
             }
             else
             {
-                Debug.Log("실패: Quad가 참조한 face와 현재 큐브의 윗면이 일치하지 않습니다!");
                 GameManager.instance.LifeLost();
             }
 
             Destroy(gameObject, 0f); // 즉시 삭제
-
-            // Quad가 삭제된 후 이벤트 등의 처리를 추가할 수 있습니다.
+            
         }
     }
 }

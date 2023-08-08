@@ -74,9 +74,7 @@ public class PlayerRotation : MonoBehaviour
             {
                 transform.Rotate(90f, 0f, 0f, Space.World);
             }
-
-            // Debug.Log()를 사용하여 맨 위에 올라온 면을 출력합니다.
-            Debug.Log("현재 맨 위에 올라온 면: Face" + currentTopFace);
+            
         }
 
         // 현재 회전값을 목표 회전값으로 보간하여 부드러운 회전을 적용합니다.
@@ -89,7 +87,7 @@ public class PlayerRotation : MonoBehaviour
         float nearestMultiple = Mathf.Round(angle / 90f) * 90f;
         return nearestMultiple;
     }
-
+        
     // 누적된 회전값을 반올림하여 최종 회전값을 계산하는 함수
     private Vector3 CalculateFinalRotation()
     {
