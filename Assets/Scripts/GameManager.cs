@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
     public GameObject[] posLineStarts;
     public GameObject[] posLineEnds;
     public GameObject playerN;
+    public GameObject endPanel;
 
     public GameObject life1;
     public GameObject life2;
@@ -36,6 +37,9 @@ public class GameManager : MonoBehaviour
     private int currentLife = 3; //현재 목숨
     private int currentScore = 0; // 현재 점수
     private int currentCombo = 0; //현재 콤보
+    
+    private int comboCount = 0; // 콤보 카운트
+    private int baseBonusScore = 50; // 기본 보너스 점수
     
    
 
@@ -147,6 +151,7 @@ public class GameManager : MonoBehaviour
 
     public void LifeLost()
     {
+        
         currentLife--;
 
         // 콤보 리셋 및 UI 업데이트
@@ -176,6 +181,16 @@ public class GameManager : MonoBehaviour
         currentCombo += 1;
         UpdateScoreUI();
         UpdateComboUI();
+        
+        comboCount++;  // 매치 성공할 때마다 콤보 카운트 증가
+        if (comboCount % 10 == 0)
+        {
+            int multiplier = comboCount / 10;
+            int bonusScore = baseBonusScore * multiplier;
+            currentScore += bonusScore;
+            // 점수에 보너스 점수 추가
+            // ... 여기에 점수를 추가하는 코드를 적용
+        }
        
     }
     
@@ -185,11 +200,11 @@ public class GameManager : MonoBehaviour
         // Life3 이미지가 사라지기를 기다립니다.
         yield return new WaitForEndOfFrame();
 
-        // 마지막 Life가 사라진 후 3초 후에 게임 종료 처리를 실행합니다.
-        yield return new WaitForSeconds(1.5f);
+        // 마지막 Life가 사라진 후 0.3초 후에 게임 종료 처리를 실행합니다.
+        yield return new WaitForSeconds(0.3f);
 
         // 게임 종료 처리
-        Debug.Log("게임 종료!");
+        endPanel.SetActive(true);
         // 여기에 게임 종료에 대한 처리를 추가할 수 있습니다.
     }
 

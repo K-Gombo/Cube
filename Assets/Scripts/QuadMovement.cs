@@ -14,9 +14,16 @@ public class QuadMovement : MonoBehaviour
 
     private bool isMoving = false;
 
+    private Transform playerTransform;
+
     private GameManager.FaceGroup referencedFaceGroup;
-    
-    
+
+
+    private void Start()
+    {
+        playerTransform = GameObject.Find("PlayerN").transform; // PlayerN 게임 오브젝트의 Transform 컴포넌트를 참조
+    }
+
     public void Initialize(Transform start, Transform end, float interval, GameManager.FaceGroup faceGroup)
     {
         startPos = start;
@@ -33,6 +40,8 @@ public class QuadMovement : MonoBehaviour
 
         // moveSpeed를 GameManager의 globalMoveSpeed로 설정
         moveSpeed = GameManager.globalMoveSpeed;
+
+
     }
 
     public void StartMoving()
@@ -43,14 +52,14 @@ public class QuadMovement : MonoBehaviour
     void Update()
     {
         if (GameManager.instance.IsGameOver())
-            return;  // 게임 종료 상태면 아무 동작도 하지 않음
+            return; // 게임 종료 상태면 아무 동작도 하지 않음
 
         moveSpeed = GameManager.globalMoveSpeed; // 동기화 추가
         if (isMoving)
             MoveQuad();
-        Debug.Log("Current moveSpeed: " + moveSpeed);
+
     }
-    
+
     public void IncreaseMoveSpeed(float amount)
     {
         moveSpeed += amount;
@@ -69,18 +78,32 @@ public class QuadMovement : MonoBehaviour
         {
             isMoving = false;
 
-            int currentTopFace = GameManager.instance.DetermineTopFace();
-            if (referencedFaceGroup == (GameManager.FaceGroup)(currentTopFace - 1))
+            // Quad가 도착한 Line의 X 위치
+            float quadXPosition = endPos.position.x;
+
+            // PlayerN의 X 위치
+            float playerXPosition = playerTransform.position.x;
+
+            // 두 위치가 일치하는지 확인합니다. (작은 오차를 고려하여 0.5f 정도의 허용 범위를 줍니다)
+            if (Mathf.Abs(quadXPosition - playerXPosition) <= 0.5f)
             {
-               GameManager.instance.MatchSuccess();
+                int currentTopFace = GameManager.instance.DetermineTopFace();
+                if (referencedFaceGroup == (GameManager.FaceGroup)(currentTopFace - 1))
+                {
+                    GameManager.instance.MatchSuccess();
+                }
+                else
+                {
+                    GameManager.instance.LifeLost();
+                }
             }
             else
             {
+                // 큐브와 Quad의 위치가 일치하지 않으면 실패로 처리
                 GameManager.instance.LifeLost();
             }
 
-            Destroy(gameObject, 0f); // 즉시 삭제
-            
+            Destroy(gameObject, 0f);
         }
     }
 }
