@@ -23,10 +23,12 @@ public class GameManager : MonoBehaviour
     public Text scoreText; // Score Text 오브젝트
     public Text comboText; // Combo Text 오브젝트
     public Text speedText; // speed Text 오브젝트
+    public Text bestScoreText; // BestScore Text 오브젝트
+    public Text nowScoreText; // NowScore Text 오브젝트
    
     private bool isGameOver = false;
 
-    private float minSpawnInterval = 2f;
+    private float minSpawnInterval = 3f;
     private float maxSpawnInterval = 5f;
     private float timer = 0f;
     private float spawnInterval = 1f;
@@ -202,10 +204,22 @@ public class GameManager : MonoBehaviour
 
         // 마지막 Life가 사라진 후 0.3초 후에 게임 종료 처리를 실행합니다.
         yield return new WaitForSeconds(0.3f);
+        
+        int highScore = PlayerPrefs.GetInt("HighScore", 0);
+        if (currentScore > highScore)
+        {
+            highScore = currentScore; // 값을 할당한 후
+            PlayerPrefs.SetInt("HighScore", highScore); // 여기에서 PlayerPrefs에 저장
+        }
+
+        bestScoreText.text =  highScore.ToString();
+        nowScoreText.text = currentScore.ToString();
+        
 
         // 게임 종료 처리
         endPanel.SetActive(true);
         // 여기에 게임 종료에 대한 처리를 추가할 수 있습니다.
+        
     }
 
     // UpdateScoreUI() 메서드 내에서 1000의 배수일 때 UpdateSpeedUI() 메서드를 호출하도록 수정
@@ -245,7 +259,6 @@ public class GameManager : MonoBehaviour
         return isGameOver;
     }
 
-    
-    
+
     
 }

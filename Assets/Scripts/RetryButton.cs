@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -7,8 +5,18 @@ public class RetryButton : MonoBehaviour
 {
     public void OnRetryButtonClick()
     {
-        // 현재 씬을 다시 로드하여 재시작
-        Scene currentScene = SceneManager.GetActiveScene();
-        SceneManager.LoadScene(currentScene.name);
+        // 현재 씬 이름을 가져옵니다.
+        string currentSceneName = SceneManager.GetActiveScene().name;
+
+        // 현재 씬 이름이 "MainScene"인 경우 "GameScene"을 로드합니다.
+        if (currentSceneName == "MainScene")
+        {
+            SceneManager.LoadScene("GameScene");
+        }
+        else
+        {
+            // 현재 씬을 다시 로드합니다.
+            SceneManager.LoadScene(currentSceneName);
+        }
     }
 }

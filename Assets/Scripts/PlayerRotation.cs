@@ -85,6 +85,7 @@ public class PlayerRotation : MonoBehaviour
     private float GetNearest90Degree(float angle)
     {
         float nearestMultiple = Mathf.Round(angle / 90f) * 90f;
+        
         return nearestMultiple;
     }
         
@@ -99,6 +100,7 @@ public class PlayerRotation : MonoBehaviour
 
         float newXRotation = GetNearest90Degree(newXRotationDiff) + defaultRotation.eulerAngles.x;
         float newZRotation = GetNearest90Degree(newZRotationDiff) + defaultRotation.eulerAngles.z;
+        
 
         return new Vector3(newXRotation, 0f, newZRotation);
     }
@@ -123,7 +125,7 @@ public class PlayerRotation : MonoBehaviour
                 }
             }
         }
-
+        
         return topFace;
     }
 }
